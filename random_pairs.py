@@ -1,4 +1,4 @@
-from itertools import cycle
+from collections import deque
 import random
 from typing import List, Optional, Tuple
 
@@ -8,27 +8,28 @@ from fire import Fire
 def create_random_pairings(people: List[str],
                            num_pairings: int,
                            seed: Optional[int] = None) -> List[List[Tuple[str, str]]]:
-    """Creates random pairings.
+    assert len(people) % 2 == 0
 
-    Creates pairings with random people in the list of people,
-    avoiding duplicates until each person has been paired with
-    everyone else. On each cycle, the order is re-randomized.
-    """
     if seed is not None:
         random.seed(seed)
 
+    num_unique_pairs = len(people) - 1
     pairings: List[List[Tuple[str, str]]] = []
 
-    for shift in cycle(range(1, len(people))):
-        if len(pairings) >= num_pairings:
-            break
-
-        # Shuffle on each cycle through all the people
-        if shift == 1:
+    for i in range(num_pairings):
+        if i % num_unique_pairs == 0:
             random.shuffle(people)
+            stationary_person = people[0]
+            shifting_people = deque(people[1:])
 
-        # Create a pairing
-        pairing = [(people[j], people[(j + shift) % len(people)]) for j in range(len(people))]
+        shifting_people.rotate(1)
+        shifted_people = list(shifting_people)
+        row_1 = [stationary_person] + shifted_people[:num_unique_pairs // 2]
+        row_2 = list(reversed(shifted_people[num_unique_pairs // 2:]))
+
+        assert len(row_1) == len(row_2)
+
+        pairing = [(person_1, person_2) for person_1, person_2 in zip(row_1, row_2)]
         pairings.append(pairing)
 
     return pairings
