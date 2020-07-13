@@ -1,3 +1,4 @@
+"""Randomly pairs people using round-robin scheduling."""
 from collections import deque
 import random
 from typing import List, Optional, Tuple
@@ -6,15 +7,28 @@ from fire import Fire
 
 
 def create_random_pairings(people: List[str],
-                           num_pairings: int,
+                           num_pairings: Optional[int] = None,
                            seed: Optional[int] = None) -> List[List[Tuple[str, str]]]:
-    assert len(people) % 2 == 0
+    """
+    Randomly pairs people using round-robin scheduling.
 
-    if seed is not None:
-        random.seed(seed)
+    :param people: A list of people to pair (including a dummy person if needed to have an even number).
+    :param num_pairings: The number of pairings to create. Defaults to a full pairing (everyone
+                         paired with everyone else exactly once).
+    :param seed: Random seed to control the pairings.
+    :return: A list of pairings where each pairing is a list of tuples of paired people.
+    """
+    assert len(people) >= 2
+    assert len(people) % 2 == 0
 
     num_unique_pairs = len(people) - 1
     pairings: List[List[Tuple[str, str]]] = []
+
+    if num_pairings is None:
+        num_pairings = num_unique_pairs
+
+    if seed is not None:
+        random.seed(seed)
 
     for i in range(num_pairings):
         if i % num_unique_pairs == 0:
@@ -35,10 +49,21 @@ def create_random_pairings(people: List[str],
     return pairings
 
 
-def random_pairs(people_path: str = 'people.txt',
-                 num_pairings: int = 1,
-                 seed: Optional[int] = None,
-                 pairings_path: str = 'pairings.txt'):
+def random_pairs(people_path: str,
+                 pairings_path: str,
+                 num_pairings: Optional[int] = None,
+                 seed: Optional[int] = None) -> None:
+    """
+    Randomly pairs people using round-robin scheduling, including loading/saving to file.
+
+    See https://en.wikipedia.org/wiki/Round-robin_tournament#Scheduling_algorithm
+
+    :param people_path: Path to a text file containing people to pair, one on each line.
+    :param num_pairings: The number of pairings to create. Defaults to a full pairing (everyone
+                         paired with everyone else exactly once).
+    :param seed: Random seed to control the pairings.
+    :param pairings_path: Path where the random pairings should be saved.
+    """
     # Load people
     with open(people_path) as f:
         people = sorted(line.strip() for line in f if line.strip() != '')
@@ -57,7 +82,7 @@ def random_pairs(people_path: str = 'people.txt',
     # Save pairings
     with open(pairings_path, 'w') as f:
         for i, pairing in enumerate(pairings):
-            f.write(f'{"-" * 10} Pairing {i} {"-" * 10}\n\n')
+            f.write(f'{"-" * 10} Pairing {i + 1} {"-" * 10}\n\n')
             f.write('\n'.join(' + '.join(pair) for pair in pairing))
             f.write('\n\n')
 
