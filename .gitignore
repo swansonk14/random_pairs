@@ -1,3 +1,5 @@
 *.txt
+*.csv
 .idea
-
+token.pickle
+credentials.json

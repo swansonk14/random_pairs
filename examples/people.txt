@@ -1,4 +1,0 @@
-Person A
-Person B
-Person C
-Person D

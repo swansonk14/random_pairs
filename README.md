@@ -16,41 +16,31 @@ pip install -r requirements.txt
 
 ## Usage
 
-First, create a text file containing all the people to be paired, one on each line. For instance, `examples/people.txt` contains the following:
+First, create a CSV file containing all the people to be paired with their email addresses, one on each line. For instance, `examples/people.csv` contains the following:
 
 ```
-Person A
-Person B
-Person C
-Person D
+Name,Email
+Person A,person_a@random_pairs.com
+Person B,person_b@random_pairs.com
+Person C,person_c@random_pairs.com
+Person D,person_d@random_pairs.com
 ```
 
 Then run `random_pairs.py`, indicating which file contains the people to pair and where the pairings should be saved. For example:
 
 ```
-python random_pairs.py --people_path examples/people.txt --pairings_path examples/pairings.txt
+python random_pairs.py --people_path examples/people.csv --pairings_dir examples/pairings
 ```
 
-This will then save the pairings to `examples/pairings.txt`, which will look like the following:
+This will then save the pairings to `examples/pairings/pairing_<i>.csv` for each pairing `<i>`, which will look like the following:
 
 ```
----------- Pairing 1 ----------
-
-Person B + Person C
-Person D + Person A
-
----------- Pairing 2 ----------
-
-Person B + Person A
-Person C + Person D
-
----------- Pairing 3 ----------
-
-Person B + Person D
-Person A + Person C
+Name_1,Email_1,Name_2,Email_2
+Person B,person_b@random_pairs.com,Person C,person_c@random_pairs.com
+Person D,person_d@random_pairs.com,Person A,person_a@random_pairs.com
 ```
 
-If there are an odd number of people, then one person will be paired with "Nobody" in each pairing.
+If there is an odd number of people, then one person will be unpaired in each pairing.
 
 ## Options
 
@@ -61,3 +51,4 @@ You can specify the number of pairings to create by adding `--num_pairings n` wh
 ### Random seed
 
 You can set a random seed for reproducibility with `--seed r` where `r` is the random seed.
+
