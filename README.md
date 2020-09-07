@@ -2,6 +2,14 @@
 
 Randomly pairs people using [round-robin scheduling](https://en.wikipedia.org/wiki/Round-robin_tournament#Scheduling_algorithm).
 
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Creating random pairs](#creating-random-pairs)
+- [Sending pairings programmatically via Gmail](#sending-pairings-programmatically-via-gmail)
+
+
 ## Installation
 
 Requires Python 3.6+.
@@ -14,7 +22,8 @@ cd random_pairs
 pip install -r requirements.txt
 ```
 
-## Usage
+
+## Creating random pairs
 
 First, create a CSV file containing all the people to be paired with their email addresses, one on each line. For instance, `examples/people.csv` contains the following:
 
@@ -42,17 +51,15 @@ Person D,person_d@random_pairs.com,Person A,person_a@random_pairs.com
 
 If there is an odd number of people, then one person will be unpaired in each pairing.
 
-## Options
+Additional options include:
 
-### Number of pairings
+* `--num_pairings n` to specify the number of pairings to be created. By default, each person will be paired with everyone else exactly once, i.e., there will be `n = #people - 1` pairings.
+* `--seed r` to set the random seed for reproducibility.
 
-You can specify the number of pairings to create by adding `--num_pairings n` where `n` is the number of pairings. By default, each person will be paired with everyone else exactly once, i.e., there will be `n = #people - 1` pairings.
 
-### Random seed
+## Sending pairings programmatically via Gmail
 
-You can set a random seed for reproducibility with `--seed r` where `r` is the random seed.
-
-## Sending emails automatically via Gmail
+After generating the pairings according to the above steps, each pairing can be emailed programmatically using Gmail.
 
 First, follow steps 1 and 2 of the following link to set up authentication and to install the required packages: https://developers.google.com/gmail/api/quickstart/python
 
@@ -64,5 +71,5 @@ python email_pairs --pairings_dir examples/pairings --pairing_num 1 --sender_nam
 
 Additional options include:
 
-* `--my_email <email>` to specify the email of the sender if the sender is a participant in the pairing.
-* `--subject_prefix <prefix>` to specify the prefix in the subject line of the email prior to `pairing_num`.
+* `--my_email name@email.com` to specify the email of the sender if the sender is a participant in the pairing. This will generate a special message to the partner of the sender in the pairing.
+* `--subject_prefix prefix` to specify the prefix in the subject line of the email prior to `pairing_num`. For example, `--subject_prefix Pairing --pairing_num 1` results in the subject `Pairing 1`.
