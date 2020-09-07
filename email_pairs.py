@@ -13,7 +13,8 @@ def email_pairs(pairings_dir: str,
                 my_email: str = None,
                 subject_prefix: str = 'Pairing',
                 token_path: str = 'token.pickle',
-                credentials_path: str = 'credentials.json') -> None:
+                credentials_path: str = 'credentials.json',
+                verbose: bool = False) -> None:
     """
     Emails each pair of people in a pairing.
 
@@ -25,13 +26,13 @@ def email_pairs(pairings_dir: str,
     :param token_path: Path to user token .pickle file. If it doesn't already exist,
                        it will be saved here.
     :param credentials_path: Path to credentials .json file.
+    :param verbose: Whether to print the emails before sending them.
     """
     # Load pairing
     pairing = pd.read_csv(os.path.join(pairings_dir, f'pairing_{pairing_num}.csv'))
 
     # Check unique emails
     unique_emails = set(pairing['Email_1']) | set(pairing['Email_2'])
-    print(unique_emails)
 
     if len(unique_emails) != 2 * len(pairing):
         raise ValueError('Emails are not unique.')
@@ -44,7 +45,7 @@ def email_pairs(pairings_dir: str,
     for name_1, email_1, name_2, email_2 in pairing.itertuples(index=False):
         # Check names and emails are None at the same time
         if (name_1 is None) != (email_1 is None) or (name_2 is None) != (email_2 is None):
-            raise ValueError()
+            raise ValueError('Names and emails are not None at the same time.')
 
         # If both are None, continue
         if name_1 is None and name_2 is None:
@@ -53,49 +54,47 @@ def email_pairs(pairings_dir: str,
         # If one is None, create unpaired message
         elif name_1 is None or name_2 is None:
             name = name_1 if name_1 is not None else name_2
-            email = email_1 if email_1 is not None else email_2
-
-            messages.append(create_message(
-                to=email,
-                subject=subject,
-                message_text=f'Hi {name},\n'
-                             f'\n'
-                             f'Unfortunately you do not have a partner this week. '
-                             f'But don\'t worry, you\'ll be paired with someone next week!\n'
-                             f'\n'
-                             f'Best,\n'
-                             f'{my_name}'
-            ))
+            to = email_1 if email_1 is not None else email_2
+            message_text = (f'Hi {name},\n'
+                            f'\n'
+                            f'Unfortunately you do not have a partner this week. '
+                            f'But don\'t worry, you\'ll be paired with someone next week!\n'
+                            f'\n'
+                            f'Best,\n'
+                            f'{my_name}')
 
         # If neither is none and one is me, send special paired message
         elif email_1 == my_email or email_2 == my_email:
-            name, email = (name_1, email_1) if email_1 != my_email else (name_2, email_2)
-
-            messages.append(create_message(
-                to=email,
-                subject=subject,
-                message_text=f'Hi {name},\n'
-                             f'\n'
-                             f'You\'re paired with me this week! '
-                             f'When would be a good time to chat?\n'
-                             f'\n'
-                             f'Best,\n'
-                             f'{my_name}'
-            ))
+            name, to = (name_1, email_1) if email_1 != my_email else (name_2, email_2)
+            message_text = (f'Hi {name},\n'
+                            f'\n'
+                            f'You\'re paired with me this week! '
+                            f'When would be a good time to chat?\n'
+                            f'\n'
+                            f'Best,\n'
+                            f'{my_name}')
 
         # If neither is none and neither is me, send paired message
         else:
-            messages.append(create_message(
-                to=f'{email_1},{email_2}',
-                subject=subject,
-                message_text=f'Hi {name_1} and {name_2},\n'
-                             f'\n'
-                             f'You two are paired this week! '
-                             f'Please try to find a time by the end of the week to meet.\n'
-                             f'Best,\n'
-                             f'\n'
-                             f'{my_name}'
-            ))
+            to = f'{email_1},{email_2}'
+            message_text = (f'Hi {name_1} and {name_2},\n'
+                            f'\n'
+                            f'You two are paired this week! '
+                            f'Please try to find a time by the end of the week to meet.\n'
+                            f'\n'
+                            f'Best,\n'
+                            f'{my_name}')
+
+        if verbose:
+            print(f'To: {to}\n'
+                  f'Subject: {subject}\n\n'
+                  f'{message_text}\n')
+
+        messages.append(create_message(
+            to=to,
+            subject=subject,
+            message_text=message_text
+        ))
 
     # # Load Gmail service
     # service = build_service(token_path=token_path, credentials_path=credentials_path)
