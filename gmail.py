@@ -1,4 +1,8 @@
-"""Send an email using Gmail."""
+"""Send an email using Gmail.
+
+https://developers.google.com/gmail/api/quickstart/python
+https://developers.google.com/gmail/api/guides/sending
+"""
 import base64
 from email.mime.text import MIMEText
 import os.path

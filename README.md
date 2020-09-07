@@ -54,6 +54,16 @@ You can set a random seed for reproducibility with `--seed r` where `r` is the r
 
 ## Sending emails automatically via Gmail
 
-https://developers.google.com/gmail/api/quickstart/python
+First, follow steps 1 and 2 of the following link to set up authentication and to install the required packages: https://developers.google.com/gmail/api/quickstart/python
 
-https://developers.google.com/gmail/api/guides/sending
+Next, run the following to email a pairing:
+
+```
+python email_pairs --pairings_dir examples/pairings --pairing_num 1
+```
+
+Additional options include:
+
+* `--my_name <name>` to specify the name signed at the bottom of the email.
+* `--my_email <email>` to specify the email of the sender if the sender is a participant in the pairing.
+* `--subject_prefix <prefix>` to specify the prefix in the subject line of the email prior to `pairing_num`.
