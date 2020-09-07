@@ -4,24 +4,36 @@ import os
 from fire import Fire
 import pandas as pd
 
-from gmail_send import build_service, create_message, send_message
+from gmail import build_service, create_message, send_message
 
 
 def email_pairs(pairings_dir: str,
                 pairing_num: int,
-                my_name: str,
+                my_name: str = 'The Pairer',
                 my_email: str = None,
                 subject_prefix: str = 'Pairing',
                 token_path: str = 'token.pickle',
-                credentials_path: str = 'credentials.json'):
-    """Emails each pair of people in a pairing."""
+                credentials_path: str = 'credentials.json') -> None:
+    """
+    Emails each pair of people in a pairing.
+
+    :param pairings_dir: Path to a directory where the random pairings are saved.
+    :param pairing_num: The number of the pairing to send.
+    :param my_name: The name of the sender, which is the name signed at the bottom of the email.
+    :param my_email: The email of the sender if the sender is a participant in the pairing.
+    :param subject_prefix: The prefix used in the subject header, followed by pairing_num.
+    :param token_path: Path to user token .pickle file. If it doesn't already exist,
+                       it will be saved here.
+    :param credentials_path: Path to credentials .json file.
+    """
     # Load pairing
-    pairing = pd.read_csv(os.path.join(pairings_dir, f'pairing_{i}.csv'))
+    pairing = pd.read_csv(os.path.join(pairings_dir, f'pairing_{pairing_num}.csv'))
 
     # Check unique emails
-    unique_emails = set(pairing['email_1']) | set(pairing['email_2'])
+    unique_emails = set(pairing['Email_1']) | set(pairing['Email_2'])
+    print(unique_emails)
 
-    if len(unique_emails) != len(pairing):
+    if len(unique_emails) != 2 * len(pairing):
         raise ValueError('Emails are not unique.')
 
     # Create subject
@@ -85,9 +97,9 @@ def email_pairs(pairings_dir: str,
                              f'{my_name}'
             ))
 
-    # Load Gmail service
-    service = build_service(token_path=token_path, credentials_path=credentials_path)
-
+    # # Load Gmail service
+    # service = build_service(token_path=token_path, credentials_path=credentials_path)
+    #
     # # Send emails
     # for message in messages:
     #     send_message(service=service, message=message)

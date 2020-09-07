@@ -5,7 +5,6 @@ import os.path
 import pickle
 from typing import Dict
 
-from fire import Fire
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build, Resource
@@ -103,27 +102,3 @@ def build_service(token_path: str = 'token.pickle',
     service = build('gmail', 'v1', credentials=creds)
 
     return service
-
-
-def gmail_send(service: Resource,
-               to: str,
-               subject: str,
-               message_text: str):
-    """
-    Send an email using Gmail.
-
-    :param service: The authenticated Gmail service object.
-    :param to: Email address(es) of the receiver. Comma separated list for multiple emails.
-    :param subject: Email subject line.
-    :param message_text: Email message text.
-    :return: The sent message.
-    """
-    # Create email message
-    message = create_message(to=to, subject=subject, message_text=message_text)
-
-    # Send email message
-    send_message(service=service, message=message)
-
-
-if __name__ == '__main__':
-    Fire(gmail_send)
