@@ -59,11 +59,10 @@ First, follow steps 1 and 2 of the following link to set up authentication and t
 Next, run the following to email a pairing:
 
 ```
-python email_pairs --pairings_dir examples/pairings --pairing_num 1
+python email_pairs --pairings_dir examples/pairings --pairing_num 1 --sender_name John
 ```
 
 Additional options include:
 
-* `--my_name <name>` to specify the name signed at the bottom of the email.
 * `--my_email <email>` to specify the email of the sender if the sender is a participant in the pairing.
 * `--subject_prefix <prefix>` to specify the prefix in the subject line of the email prior to `pairing_num`.

@@ -9,36 +9,31 @@ from gmail import build_service, create_message, send_message
 
 def email_pairs(pairings_dir: str,
                 pairing_num: int,
-                my_name: str = 'The Pairer',
+                sender_name: str,
                 my_email: str = None,
                 subject_prefix: str = 'Pairing',
                 token_path: str = 'token.pickle',
-                credentials_path: str = 'credentials.json',
-                verbose: bool = False) -> None:
+                credentials_path: str = 'credentials.json') -> None:
     """
     Emails each pair of people in a pairing.
 
     :param pairings_dir: Path to a directory where the random pairings are saved.
     :param pairing_num: The number of the pairing to send.
-    :param my_name: The name of the sender, which is the name signed at the bottom of the email.
+    :param sender_name: The name of the sender, which is the name signed at the bottom of the email.
     :param my_email: The email of the sender if the sender is a participant in the pairing.
     :param subject_prefix: The prefix used in the subject header, followed by pairing_num.
     :param token_path: Path to user token .pickle file. If it doesn't already exist,
                        it will be saved here.
     :param credentials_path: Path to credentials .json file.
-    :param verbose: Whether to print the emails before sending them.
     """
     # Load pairing
     pairing = pd.read_csv(os.path.join(pairings_dir, f'pairing_{pairing_num}.csv'))
 
-    # Check unique emails
-    unique_emails = set(pairing['Email_1']) | set(pairing['Email_2'])
-
-    if len(unique_emails) != 2 * len(pairing):
-        raise ValueError('Emails are not unique.')
+    # Convert NaN to None
+    pairing = pairing.where(pairing.notna(), None)
 
     # Create subject
-    subject = f'{subject_prefix} {pairing_num}'
+    subject = f'{subject_prefix.strip()} {pairing_num}'
 
     # Build email messages
     messages = []
@@ -57,11 +52,11 @@ def email_pairs(pairings_dir: str,
             to = email_1 if email_1 is not None else email_2
             message_text = (f'Hi {name},\n'
                             f'\n'
-                            f'Unfortunately you do not have a partner this week. '
-                            f'But don\'t worry, you\'ll be paired with someone next week!\n'
+                            f'Unfortunately you don\'t have a partner this week. '
+                            f'But don\'t worry, you\'ll have a partner again next week!\n'
                             f'\n'
                             f'Best,\n'
-                            f'{my_name}')
+                            f'{sender_name}')
 
         # If neither is none and one is me, send special paired message
         elif email_1 == my_email or email_2 == my_email:
@@ -72,7 +67,7 @@ def email_pairs(pairings_dir: str,
                             f'When would be a good time to chat?\n'
                             f'\n'
                             f'Best,\n'
-                            f'{my_name}')
+                            f'{sender_name}')
 
         # If neither is none and neither is me, send paired message
         else:
@@ -80,21 +75,30 @@ def email_pairs(pairings_dir: str,
             message_text = (f'Hi {name_1} and {name_2},\n'
                             f'\n'
                             f'You two are paired this week! '
-                            f'Please try to find a time by the end of the week to meet.\n'
+                            f'Please try to find a time by the end of the week to chat.\n'
                             f'\n'
                             f'Best,\n'
-                            f'{my_name}')
+                            f'{sender_name}')
 
-        if verbose:
-            print(f'To: {to}\n'
-                  f'Subject: {subject}\n\n'
-                  f'{message_text}\n')
+        print(f'Email {len(messages) + 1}\n'
+              f'To: {to}\n'
+              f'Subject: {subject}\n\n'
+              f'{message_text}\n')
 
         messages.append(create_message(
             to=to,
             subject=subject,
             message_text=message_text
         ))
+
+    # Check whether to send the emails
+    send = input(f'Would you like to send these {len(messages):,} emails? Y/n: ')
+
+    if send.lower() != 'y':
+        print('Not sending.')
+        return
+
+    print('Sending')
 
     # # Load Gmail service
     # service = build_service(token_path=token_path, credentials_path=credentials_path)
