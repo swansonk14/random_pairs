@@ -101,10 +101,10 @@ def random_pairs(people_path: str,
 
     for i, pairing in enumerate(pairings):
         pairing_data = pd.DataFrame(data=[{
-            f'{name_column}_1': pair[0][name_column],
-            f'{email_column}_1': pair[0][email_column],
-            f'{name_column}_2': pair[1][name_column],
-            f'{email_column}_2': pair[1][email_column]
+            f'Name_1': pair[0][name_column],
+            f'Email_1': pair[0][email_column],
+            f'Name_2': pair[1][name_column],
+            f'Email_2': pair[1][email_column]
         } for pair in pairing])
 
         pairing_data.to_csv(os.path.join(pairings_dir, f'pairing_{i + 1}.csv'), index=False)

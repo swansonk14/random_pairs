@@ -52,3 +52,8 @@ You can specify the number of pairings to create by adding `--num_pairings n` wh
 
 You can set a random seed for reproducibility with `--seed r` where `r` is the random seed.
 
+## Sending emails automatically via Gmail
+
+https://developers.google.com/gmail/api/quickstart/python
+
+https://developers.google.com/gmail/api/guides/sending
