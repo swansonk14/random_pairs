@@ -65,7 +65,6 @@ def send_message(service: Resource, message: Dict[str, str]) -> Dict[str, str]:
     """
     try:
         message = service.users().messages().send(userId=ME, body=message).execute()
-        print(f'Message Id: {message["id"]}')
         return message
     except HttpError as error:
         print(f'An error occurred: {error}')

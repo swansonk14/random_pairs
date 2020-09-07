@@ -100,12 +100,13 @@ def email_pairs(pairings_dir: str,
 
     print('Sending')
 
-    # # Load Gmail service
-    # service = build_service(token_path=token_path, credentials_path=credentials_path)
-    #
-    # # Send emails
-    # for message in messages:
-    #     send_message(service=service, message=message)
+    # Load Gmail service
+    service = build_service(token_path=token_path, credentials_path=credentials_path)
+
+    # Send emails
+    for i, message in enumerate(messages):
+        message = send_message(service=service, message=message)
+        print(f'Message {i} Id: {message["id"]}')
 
 
 if __name__ == '__main__':
