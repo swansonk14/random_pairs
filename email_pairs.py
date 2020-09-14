@@ -92,18 +92,16 @@ def email_pairs(pairings_dir: str,
         ))
 
     # Check whether to send the emails
-    send = input(f'Would you like to send these {len(messages):,} emails? Y/n: ')
-
-    if send.lower() != 'y':
-        print('Not sending.')
+    if input(f'Would you like to send these {len(messages):,} emails? Y/n: ').lower() != 'y':
+        print('Not sending emails')
         return
 
-    print('Sending')
-
     # Load Gmail service
+    print('Building Gmail service')
     service = build_service(token_path=token_path, credentials_path=credentials_path)
 
     # Send emails
+    print('Sending emails')
     for i, message in enumerate(messages):
         message = send_message(service=service, message=message)
         print(f'Message {i} Id: {message["id"]}')
